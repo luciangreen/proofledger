@@ -21,3 +21,9 @@ theorem(append_only) :- forall(( items(Is), build(Is, L), member(T-S, [t1-proved
 
 % 4. A theorem's status is the one most recently recorded.
 theorem(latest_status) :- forall(( items(Is), build(Is, L), member(T, [t1, t2]) ), ( reverse(Is, R), ( memberchk(T-S, R) -> status(L, T, S) ; \+ status(L, T, _) ) )).
+
+% 5. With the latest hash published, a forger who changes any entry and then rebuilds the whole
+%    chain (so verify/1 passes) is still caught by verify/2, while the true ledger passes it.
+theorem(anchored_catches_rebuilt_forgery) :- forall(( items(Is), build(Is, L), head(L, A), nth1(K, Is, T-S), member(T2-S2, [t1-proved, t1-failed, t2-proved, t2-failed]), T2-S2 \== T-S ),
+    ( verify(L, A), nth1(K, Is, _, Rest), nth1(K, Is2, T2-S2, Rest), build(Is2, L2), verify(L2), \+ verify(L2, A) )).
+
